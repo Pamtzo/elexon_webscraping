@@ -16,6 +16,7 @@ if not os.path.exists('dataset'):
     os.makedirs('dataset')
 
 #Starting driver
+print("STARTING BROWSER...")
 fp = webdriver.FirefoxProfile()
 fp.set_preference("browser.download.folderList",2)
 fp.set_preference("browser.download.manager.showWhenStarting",False)
@@ -30,6 +31,7 @@ driver.get(url)
 cookies = wait.until(expected_conditions.element_to_be_clickable(
     (By.XPATH,'//*[@id="cc-approve-button-thissite"]'))
 ).click()
+print("WAITING FOR RELOAD")
 time.sleep(10)
 
 #Date elements
@@ -44,21 +46,24 @@ view = wait.until(expected_conditions.presence_of_element_located(
 start_date = datetime.strptime(start_date, '%Y-%m-%d')
 end_date = datetime.strptime(end_date, '%Y-%m-%d')
 
-print(start_date, end_date)
+print(start_date, " TO ", end_date)
 
 while(start_date <= end_date):
-    driver.execute_script("arguments[0].value = arguments[1]", calendar, start_date.strftime('%Y-%m-%d'))
-    view.click()
+    try:
+        driver.execute_script("arguments[0].value = arguments[1]", calendar, start_date.strftime('%Y-%m-%d'))
+        view.click()
 
-    wait.until(expected_conditions.invisibility_of_element_located(
-        (By.XPATH,"//div[@class='blockUI blockOverlay']"))
-    )
+        wait.until(expected_conditions.invisibility_of_element_located(
+            (By.XPATH,"//div[@class='blockUI blockOverlay']"))
+        )
 
-    time.sleep(5)
+        time.sleep(5)
 
-    download = wait.until(expected_conditions.element_to_be_clickable(
-        (By.XPATH,'//*[@id="-sysemsellbuyprices-historic"]/div/div[3]/div/div[4]/div[1]/a/img'))
-    ).click()
+        download = wait.until(expected_conditions.element_to_be_clickable(
+            (By.XPATH,'//*[@id="-sysemsellbuyprices-historic"]/div/div[3]/div/div[4]/div[1]/a/img'))
+        ).click()
+    except:
+        print("PROBLEM WITH: ", start_date)
 
     start_date += timedelta(days=1)
 
